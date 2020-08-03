@@ -47,7 +47,9 @@ void setup() {
   lcd.noCursor();
   dallas_begin(DS_PIN); // инициализация  
   PowerRele_State = OFF;
-  digitalWrite(PowerRele_pin, LOW);   // turn Rele Off
+  pinMode(PowerRele_pin, OUTPUT);
+  digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+
   lcd.setCursor(0, 0);  
   lcd.print("Rele Off        "); 
 }
@@ -64,21 +66,21 @@ void loop() {
     Serial.println("TempSensor error - out of range"); 
     lcd.setCursor(0, 0);  
     lcd.print("TempSensor error");    
-    digitalWrite(PowerRele_pin, LOW);   // turn Rele Off
+    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
     PowerRele_State = OFF;
   }
   
   else if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
   {
     PowerRele_State = OFF;
-    digitalWrite(PowerRele_pin, LOW);   // turn Rele Off
+    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
     lcd.setCursor(0, 0);  
     lcd.print("Rele Off        ");   
   }
   else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State)   )
   {
     PowerRele_State = ON;
-    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+    digitalWrite(PowerRele_pin, LOW);   // turn Rele ON
     lcd.setCursor(0, 0);  
     lcd.print("Rele ON         ");  
   }
@@ -90,7 +92,6 @@ void loop() {
     lcd.print("C  "); 
     lcd.print(TargetTemperature + TemperatureWindow);  
     lcd.print("C");
-
 }
 
 //Далее следует кусок чужого кода, который заявлен как самый легкий и быстрый для опроа датчика температуры
