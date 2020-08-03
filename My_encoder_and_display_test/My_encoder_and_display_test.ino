@@ -15,7 +15,6 @@ Encoder enc1(CLK, DT, SW);  // для работы c кнопкой
 // Encoder enc(пин CLK, пин DT, пин SW, тип);	// энкодер с кнопкой и указанием типа
 // Encoder enc(пин CLK, пин DT, ENC_NO_BUTTON, тип);	// энкодер без кнопкой и с указанием типа
 
-
 // include the library code:
 #include <LiquidCrystal.h>
 
@@ -39,37 +38,40 @@ unsigned char PowerRele_State;
 #define OFF 9
 #define PowerRele_pin 10
 
+#define buzzer 13
 
 void setup() {
-  Serial.begin(9600);
-  enc1.setType(TYPE2);
-  lcd.begin(16, 2);
+  Serial.begin(9600); // Настройка последовательного порта для отправки отладочной информации на ПК
+  enc1.setType(TYPE2);    // Настройка Энкодера
+  lcd.begin(16, 2);       // Настройка дисплея
   lcd.noCursor();
-  dallas_begin(DS_PIN); // инициализация  
-  PowerRele_State = OFF;
-  pinMode(PowerRele_pin, OUTPUT);
+  dallas_begin(DS_PIN); // инициализация  датчика температуры
+  
+  PowerRele_State = OFF;                //По подаче питания надо отключить реле.
+  pinMode(PowerRele_pin, OUTPUT);       //
   digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
 
   lcd.setCursor(0, 0);  
   lcd.print("Rele Off        "); 
+
+  pinMode(buzzer, OUTPUT); // Set buzzer - pin 13 as an output
+
 }
 
 void loop() {
   
   dallas_requestTemp(DS_PIN); // запрос
-  delay(1000);
+  delay(900);
+  tone(buzzer, 1000,100);
   float Current_tempr_value = dallas_getTemp(DS_PIN);
-  Serial.println(Current_tempr_value); // получаем температуру
     
   if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) 
   {
-    Serial.println("TempSensor error - out of range"); 
     lcd.setCursor(0, 0);  
     lcd.print("TempSensor error");    
     digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
     PowerRele_State = OFF;
-  }
-  
+  }  
   else if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
   {
     PowerRele_State = OFF;
@@ -85,13 +87,13 @@ void loop() {
     lcd.print("Rele ON         ");  
   }
 
-    lcd.setCursor(0, 1);  
-    lcd.print(TargetTemperature - TemperatureWindow);
-    lcd.print("C  ");    
-    lcd.print(Current_tempr_value);
-    lcd.print("C  "); 
-    lcd.print(TargetTemperature + TemperatureWindow);  
-    lcd.print("C");
+  lcd.setCursor(0, 1);  
+  lcd.print(TargetTemperature - TemperatureWindow);
+  lcd.print("C  ");    
+  lcd.print(Current_tempr_value);
+  lcd.print("C  "); 
+  lcd.print(TargetTemperature + TemperatureWindow);  
+  lcd.print("C");
 }
 
 //Далее следует кусок чужого кода, который заявлен как самый легкий и быстрый для опроа датчика температуры
