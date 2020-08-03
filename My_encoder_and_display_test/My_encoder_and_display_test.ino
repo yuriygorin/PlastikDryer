@@ -26,50 +26,74 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 #define DS_PIN 9  // пин датчика
 
+// Целевая температура, будет зависеть от типа пластика примерно от 50 для ПЛА до 90 для нейлона
+#define TargetTemperature 25 
+// окно гистерезиса, чтоб не постоянно щелкать релюхой, а только иногда. Диапазон допустимых температур от TargetTemperature - TemperatureWindow до TargetTemperature + TemperatureWindow
+#define TemperatureWindow 2
+#define TemperatureMaxWorkRange 100
+#define TemperatureMinWorkRange 5
+
+//Defines for power Rele States
+unsigned char PowerRele_State;
+#define ON 8
+#define OFF 9
+#define PowerRele_pin 10
+
 
 void setup() {
   Serial.begin(9600);
   enc1.setType(TYPE2);
   lcd.begin(16, 2);
+  lcd.noCursor();
   dallas_begin(DS_PIN); // инициализация  
-
+  PowerRele_State = OFF;
+  digitalWrite(PowerRele_pin, LOW);   // turn Rele Off
+  lcd.setCursor(0, 0);  
+  lcd.print("Rele Off        "); 
 }
 
 void loop() {
-
+  
   dallas_requestTemp(DS_PIN); // запрос
-//  delay(1000);
-  
-	// обязательная функция отработки. Должна постоянно опрашиваться
-  enc1.tick();
-  
-  if (enc1.isTurn()) {     // если был совершён поворот (индикатор поворота в любую сторону)
-    // ваш код
+  delay(1000);
+  float Current_tempr_value = dallas_getTemp(DS_PIN);
+  Serial.println(Current_tempr_value); // получаем температуру
+    
+  if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) 
+  {
+    Serial.println("TempSensor error - out of range"); 
+    lcd.setCursor(0, 0);  
+    lcd.print("TempSensor error");    
+    digitalWrite(PowerRele_pin, LOW);   // turn Rele Off
+    PowerRele_State = OFF;
   }
   
-  if (enc1.isRight()) { Serial.println("Right");     lcd.print("Right"); }     // если был поворот
-  if (enc1.isLeft())  { Serial.println("Left");      lcd.print("Left"); }
-  
-  if (enc1.isRightH()) Serial.println("Right holded"); // если было удержание + поворот
-  if (enc1.isLeftH())  Serial.println("Left holded");
-  
-  //if (enc1.isPress()) Serial.println("Press");         // нажатие на кнопку (+ дебаунс)
-  //if (enc1.isRelease()) Serial.println("Release");     // то же самое, что isClick
-  
-  if (enc1.isClick()) Serial.println("Click");         // одиночный клик
-  if (enc1.isSingle()) Serial.println("Single");       // одиночный клик (с таймаутом для двойного)
-  if (enc1.isDouble()) Serial.println("Double");       // двойной клик
-  
-  
-  if (enc1.isHolded()) Serial.println("Holded");       // если была удержана и энк не поворачивался
-  //if (enc1.isHold()) Serial.println("Hold");         // возвращает состояние кнопки
-  
-  float value = dallas_getTemp(DS_PIN);
-  Serial.println(value); // получаем температуру
+  else if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
+  {
+    PowerRele_State = OFF;
+    digitalWrite(PowerRele_pin, LOW);   // turn Rele Off
+    lcd.setCursor(0, 0);  
+    lcd.print("Rele Off        ");   
+  }
+  else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State)   )
+  {
+    PowerRele_State = ON;
+    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+    lcd.setCursor(0, 0);  
+    lcd.print("Rele ON         ");  
+  }
+
+    lcd.setCursor(0, 1);  
+    lcd.print(TargetTemperature - TemperatureWindow);
+    lcd.print("C  ");    
+    lcd.print(Current_tempr_value);
+    lcd.print("C  "); 
+    lcd.print(TargetTemperature + TemperatureWindow);  
+    lcd.print("C");
 
 }
 
-//Далее следует кусок чужого кода, который заявлен как самый легкий и быстрый
+//Далее следует кусок чужого кода, который заявлен как самый легкий и быстрый для опроа датчика температуры
 // ======= dallas =======
 void dallas_begin(uint8_t pin) {
   pinMode(pin, INPUT);
