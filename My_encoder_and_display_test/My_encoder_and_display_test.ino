@@ -1,19 +1,11 @@
+
+#include <GyverTimer1.h>
+
+#include "GyverEncoder.h"
 #define CLK 8
 #define DT 7
 #define SW 6
-
-#include "GyverEncoder.h"
-//Encoder enc1(CLK, DT);      // для работы без кнопки
 Encoder enc1(CLK, DT, SW);  // для работы c кнопкой
-//Encoder enc1(CLK, DT, SW, TYPE2);  // для работы c кнопкой и сразу выбираем тип
-//Encoder enc1(CLK, DT, ENC_NO_BUTTON, TYPE2);  // для работы без кнопки и сразу выбираем тип
-
-// Варианты инициализации:
-// Encoder enc;									// не привязан к пину
-// Encoder enc(пин CLK, пин DT);				// энкодер без кнопки (ускоренный опрос)
-// Encoder enc(пин CLK, пин DT, пин SW);		// энкодер с кнопкой
-// Encoder enc(пин CLK, пин DT, пин SW, тип);	// энкодер с кнопкой и указанием типа
-// Encoder enc(пин CLK, пин DT, ENC_NO_BUTTON, тип);	// энкодер без кнопкой и с указанием типа
 
 // include the library code:
 #include <LiquidCrystal.h>
@@ -40,9 +32,46 @@ unsigned char PowerRele_State;
 
 #define buzzer 13
 
+const char *Menus[]  = {
+  "PlasticDryer 02b",     // 01
+  "yuriygorin@ya.ru",     // 02
+  
+  " Press and hold ",
+  "encoder to start",
+  
+  " Click to setup ",
+  " type and time  ",
+  
+  " Select plastik ",
+  "PLA ABS PETG NYL",
+  
+  "Dry plastic for ",
+  "HH hours MM min ",
+  
+  "  Waiting GGGoC ",
+  "  Left    HH:MM ",
+  
+  "  Drying  GGGoC ",
+  "  Left    HH:MM ",
+  
+  "    Success     ",
+  "  Drying ended  ",
+  
+  " Press and hold ",
+  "encoder to stop ",
+
+  "TempSensor error",
+  " Drying stoped  "
+
+};
+
 void setup() {
   Serial.begin(9600); // Настройка последовательного порта для отправки отладочной информации на ПК
+  
   enc1.setType(TYPE2);    // Настройка Энкодера
+  attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
+  attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
+
   lcd.begin(16, 2);       // Настройка дисплея
   lcd.noCursor();
   dallas_begin(DS_PIN); // инициализация  датчика температуры
@@ -51,15 +80,234 @@ void setup() {
   pinMode(PowerRele_pin, OUTPUT);       //
   digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
 
+//  lcd.setCursor(0, 0);  
+//  lcd.print("Rele Off        "); 
+
   lcd.setCursor(0, 0);  
-  lcd.print("Rele Off        "); 
+  lcd.print(Menus[0]); 
+  lcd.setCursor(0, 1);  
+  lcd.print(Menus[1]); 
+  
+
 
   pinMode(buzzer, OUTPUT); // Set buzzer - pin 13 as an output
 
+  timer1_setFrequency(10);    // ставим 10 герца
+  timer1_ISR(handler_10Hz);    // подключить прерывание
+  timer1_start();         // запустить таймер
+}
+
+
+
+
+char InSecondCounter = 0;
+unsigned char LCDScreenIndex = 0;
+float Current_tempr_value;
+unsigned char Mode;
+#define IntroMode     1
+#define SelectMode    2
+#define TimeSetMode   3
+#define WaitMode      4
+#define DryMode       5
+#define DoneMode      6
+
+
+
+void isrCLK() {
+  enc1.tick();  // отработка в прерывании
+}
+void isrDT() {
+  enc1.tick();  // отработка в прерывании
+}
+
+void handler_10Hz() {
+  enc1.tick();     // отработка теперь находится здесь
+  InSecondCounter++;
+  switch (InSecondCounter) {
+    case 1: 
+      dallas_requestTemp(DS_PIN); // запрос
+      break;
+    case 2: 
+    {
+      enc1.tick();     // отработка теперь находится здесь
+      if (enc1.isRight())
+      {
+        Serial.println("Right");         // если был поворот
+        switch (Mode) {
+          case IntroMode: 
+          {
+            
+          }
+          break;
+          case SelectMode: 
+          {
+            
+          }
+          break;
+          case TimeSetMode: 
+          {
+            
+          }
+          break;
+          case WaitMode: 
+          case DryMode: 
+          case DoneMode: 
+          {
+            
+          }
+          break;                                                       
+        }
+      }
+      if (enc1.isLeft())
+      {
+        Serial.println("Left");         // если был поворот
+        switch (Mode) {
+          case IntroMode: 
+          {
+            
+          }
+          break;
+          case SelectMode: 
+          {
+            
+          }
+          break;
+          case TimeSetMode: 
+          {
+            
+          }
+          break;
+          case WaitMode: 
+          case DryMode: 
+          case DoneMode: 
+          {
+            
+          }
+          break;                                                       
+        }
+      }
+      if (enc1.isHolded())
+      {
+        Serial.println("Hold");         
+        switch (Mode) {
+          case IntroMode: 
+          {
+            
+          }
+          break;
+          case SelectMode: 
+          {
+            
+          }
+          break;
+          case TimeSetMode: 
+          {
+            
+          }
+          break;
+          case WaitMode: 
+          case DryMode: 
+          case DoneMode: 
+          {
+            
+          }
+          break;                                                       
+        }
+      }      
+      if (enc1.isClick())
+      {
+        Serial.println("Click");   
+        switch (Mode) {
+          case IntroMode: 
+          {
+            
+          }
+          break;
+          case SelectMode: 
+          {
+            
+          }
+          break;
+          case TimeSetMode: 
+          {
+            
+          }
+          break;
+          case WaitMode: 
+          case DryMode: 
+          case DoneMode: 
+          {
+            
+          }
+          break;                                                       
+        }
+      } 
+    }
+      break;
+    case 3: 
+      break;
+    case 4: 
+      break;
+    case 5: 
+    {
+      Current_tempr_value = dallas_getTemp(DS_PIN);
+      if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) 
+      {
+        digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+        PowerRele_State = OFF;
+        // todo Go to sensor Error Mode
+      } 
+      else if ( Mode == WaitMode ) 
+      {        
+        // todo Update temperature value on LCD string       
+      }      
+      else if ( Mode == DryMode ) 
+      { 
+        if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
+        {
+          PowerRele_State = OFF;
+          digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+        }
+        else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State)   )
+        {
+          PowerRele_State = ON;
+          digitalWrite(PowerRele_pin, LOW);   // turn Rele ON 
+        }
+        //todo Update temperature value on LCD string
+      }
+    }      
+      break;
+    case 6: 
+      break;
+    case 7: 
+      break; 
+    case 8: 
+      break; 
+    case 9: 
+    {
+      lcd.setCursor(0, 0);  
+      lcd.print(Menus[LCDScreenIndex*2]); 
+      lcd.setCursor(0, 1);  
+      lcd.print(Menus[LCDScreenIndex*2+1]);
+    }
+      break;                             
+    case 10:       
+      InSecondCounter = 0;          
+      break;
+  }
 }
 
 void loop() {
-  
+  enc1.tick();     // отработка теперь находится здесь
+  if (enc1.isRight()) Serial.println("Right");         // если был поворот
+  if (enc1.isLeft()) Serial.println("Left");
+  if (enc1.isHolded()) Serial.println("Holded");       // если была удержана и энк не поворачивался
+  if (enc1.isClick()) Serial.println("Click");         // одиночный клик
+}
+/*
+ void loop() 
+{
+
   dallas_requestTemp(DS_PIN); // запрос
   delay(900);
   tone(buzzer, 1000,100);
@@ -96,6 +344,7 @@ void loop() {
   lcd.print("C");
 }
 
+*/
 //Далее следует кусок чужого кода, который заявлен как самый легкий и быстрый для опроа датчика температуры
 // ======= dallas =======
 void dallas_begin(uint8_t pin) {
