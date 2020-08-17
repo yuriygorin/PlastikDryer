@@ -70,7 +70,7 @@ void setup() {
   
   enc1.setType(TYPE2);    // Настройка Энкодера
   attachInterrupt(0, isrCLK, CHANGE);    // прерывание на 2 пине! CLK у энка
-  attachInterrupt(1, isrDT, CHANGE);    // прерывание на 3 пине! DT у энка
+  attachInterrupt(1, isrDT,  CHANGE);    // прерывание на 3 пине! DT у энка
 
   lcd.begin(16, 2);       // Настройка дисплея
   lcd.noCursor();
@@ -104,12 +104,25 @@ char InSecondCounter = 0;
 unsigned char LCDScreenIndex = 0;
 float Current_tempr_value;
 unsigned char Mode;
+unsigned char CurrentScreen = 0;
 #define IntroMode     1
 #define SelectMode    2
 #define TimeSetMode   3
 #define WaitMode      4
 #define DryMode       5
 #define DoneMode      6
+
+#define Screen_1      0
+#define Screen_2      1
+#define Screen_3      2
+#define Screen_4      3
+#define Screen_5      4
+#define Screen_6      5
+#define Screen_7      6
+#define Screen_8      7
+#define Screen_9      8
+
+unsigned char InfoScreen_TimeOut = 0;
 
 
 
@@ -125,8 +138,19 @@ void handler_10Hz() {
   InSecondCounter++;
   switch (InSecondCounter) {
     case 1: 
-      dallas_requestTemp(DS_PIN); // запрос
-      break;
+    {
+      dallas_requestTemp(DS_PIN); // запрос на начало изменения температуры
+      if ( 0 != InfoScreen_TimeOut ) 
+      {
+        InfoScreen_TimeOut--;
+      }
+      else 
+      {
+        if (IntroMode == Mode )
+          LCDScreenIndex = Screen_1;
+      }
+    }
+    break;
     case 2: 
     {
       enc1.tick();     // отработка теперь находится здесь
@@ -136,7 +160,8 @@ void handler_10Hz() {
         switch (Mode) {
           case IntroMode: 
           {
-            
+            LCDScreenIndex = Screen_3;
+            InfoScreen_TimeOut = 100; // 10 секундный таймер переустановлен 
           }
           break;
           case SelectMode: 
@@ -164,7 +189,8 @@ void handler_10Hz() {
         switch (Mode) {
           case IntroMode: 
           {
-            
+            LCDScreenIndex = Screen_1;
+            InfoScreen_TimeOut = 100; // 10 секундный таймер переустановлен             
           }
           break;
           case SelectMode: 
@@ -192,7 +218,7 @@ void handler_10Hz() {
         switch (Mode) {
           case IntroMode: 
           {
-            
+            Mode = WaitMode;
           }
           break;
           case SelectMode: 
@@ -220,7 +246,7 @@ void handler_10Hz() {
         switch (Mode) {
           case IntroMode: 
           {
-            
+            Mode = SelectMode;
           }
           break;
           case SelectMode: 
