@@ -97,7 +97,7 @@ void setup() {
   
   pinMode(buzzer, OUTPUT); // Set buzzer - pin 13 as an output
 
-  timer1_setFrequency(1000);    // ставим 10 герца
+  timer1_setFrequency(100);    // ставим 10 герца
   timer1_ISR(handler_10Hz);    // подключить прерывание
   timer1_start();         // запустить таймер
 }
@@ -390,9 +390,9 @@ void handler_10Hz() {
     {
       if ( Mode == SelectMode )  {
         lcd.setCursor(0, 0);  
-        lcd.print(Menus[LCDScreenIndex*2]); 
+        lcd.print(Menus[Screen_4*2]); 
         lcd.setCursor(0, 1);  
-        lcd.print(Menus[LCDScreenIndex*2+1]);        
+        lcd.print(PlasticSelect_Menu[PlasticType_index]);      
       }
       else if ( Mode == TimeSetMode ) {
         lcd.setCursor(0, 0);  
@@ -408,14 +408,14 @@ void handler_10Hz() {
         if (Minutes < 10 )
           lcd.print(" ");
         lcd.print(Minutes);
-        lcd.print(" min");                             
+        lcd.print(" min ");                                     
       }
       else {
         lcd.setCursor(0, 0);  
         lcd.print(Menus[LCDScreenIndex*2]); 
         lcd.setCursor(0, 1);  
-        lcd.print(PlasticSelect_Menu[PlasticType_index]);
-      }      
+        lcd.print(Menus[LCDScreenIndex*2+1]);
+        }      
     }
       break;                             
     case 10:       
