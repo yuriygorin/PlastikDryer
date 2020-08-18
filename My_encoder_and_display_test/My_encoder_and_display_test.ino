@@ -31,36 +31,46 @@ unsigned char PowerRele_State;
 #define PowerRele_pin 10
 
 #define buzzer 13
+const char *PlasticSelect_Menu [] ={
+  "PLA abs petg nyl",
+  "pla ABS petg nyl",
+  "pla abs PETG nyl",
+  "pla abs petg NYL"
+};
+
 
 const char *Menus[]  = {
   "PlasticDryer 02b",     // 01
-  "yuriygorin@ya.ru",     // 02
+  "yuriygorin@ya.ru",     
   
-  " Press and hold ",
+  " Press and hold ",     // 02
   "encoder to start",
   
-  " Click to setup ",
+  " Click to setup ",     // 03
   " type and time  ",
   
-  " Select plastik ",
+  " Select plastik ",     // 04
   "PLA ABS PETG NYL",
   
-  "Dry plastic for ",
+  "Dry plastic for ",     // 05
   "HH hours MM min ",
   
-  "  Waiting GGGoC ",
+  "  Waiting GGGoC ",     // 06
   "  Left    HH:MM ",
   
-  "  Drying  GGGoC ",
+  "  Drying  GGGoC ",     // 07
   "  Left    HH:MM ",
   
-  "    Success     ",
+  "    Success     ",     // 08
   "  Drying ended  ",
   
-  " Press and hold ",
+  "  Click to next ",     // 08
+  "  Hold to start ",
+  
+  " Press and hold ",     // 10
   "encoder to stop ",
 
-  "TempSensor error",
+  "TempSensor error",     // 11
   " Drying stoped  "
 
 };
@@ -104,15 +114,22 @@ char InSecondCounter = 0;
 unsigned char LCDScreenIndex = 0;
 float Current_tempr_value;
 unsigned char Mode = 1;
-unsigned char CurrentScreen = 0;
+unsigned char CurrentScreen;
 unsigned int InfoScreen_TimeOut = 0;
 
-#define IntroMode     1
-#define SelectMode    2
-#define TimeSetMode   3
-#define WaitMode      4
-#define DryMode       5
-#define DoneMode      6
+#define IntroMode         1
+#define SelectMode        2
+#define TimeSetMode       3
+#define WaitMode          4
+#define DryMode           5
+#define DoneMode          6
+#define Intro_Hint    7
+#define Select_Hint   8
+#define TimeSet_Hint  9
+#define Wait_Hint     10
+#define Dry_Hint      11
+#define DoneMode_Hint     12
+
 
 #define Screen_1      0
 #define Screen_2      1
@@ -123,9 +140,18 @@ unsigned int InfoScreen_TimeOut = 0;
 #define Screen_7      6
 #define Screen_8      7
 #define Screen_9      8
+#define Screen_10     9
 
+unsigned char PlasticType_index = 0;
+#define PlasticType_index_max  3
+#define PlasticType_index_min  0
 
-
+unsigned int WaitTime_5min_step = 0;
+#define WaitTime_5min_step_Max 288
+unsigned int    TotalTime; 
+const unsigned char DryTime[4] = {10, 20, 30, 40};       
+unsigned char       Hours;
+unsigned char       Minutes;
 
 void isrCLK() {
   enc1.tick();  // отработка в прерывании
@@ -138,8 +164,7 @@ void handler_10Hz() {
   enc1.tick();     // отработка теперь находится здесь
   InSecondCounter++;
   switch (InSecondCounter) {
-    case 1: 
-    {
+    case 1: {
       dallas_requestTemp(DS_PIN); // запрос на начало изменения температуры
       if ( 0 == InfoScreen_TimeOut ) 
       { 
@@ -154,95 +179,139 @@ void handler_10Hz() {
       }
     }
     break;
-    case 2: 
-    {
+    case 2: {
       enc1.tick();     // отработка теперь находится здесь
       if (enc1.isRight())
       {
         Serial.println("Right");         // если был поворот
         switch (Mode) {
-          case IntroMode: 
-          {
+          case IntroMode: {
             LCDScreenIndex = Screen_3;
             InfoScreen_TimeOut = 100; // 10 секундный таймер переустановлен 
           }
           break;
-          case SelectMode: 
-          {
-            
+          case SelectMode: {
+            if ( PlasticType_index < PlasticType_index_max )
+              PlasticType_index++;
           }
           break;
-          case TimeSetMode: 
-          {
-            
+          case TimeSetMode: {
+            if ( WaitTime_5min_step < WaitTime_5min_step_Max )
+              WaitTime_5min_step++;
           }
           break;
           case WaitMode: 
           case DryMode: 
-          case DoneMode: 
-          {
-            
+          case DoneMode: {
+            Mode = Dry_Hint;
+            LCDScreenIndex = Screen_10;
           }
-          break;                                                       
+          break;   
+          case Intro_Hint:{
+            //nothing to do
+          }
+          break; 
+          case Select_Hint:{
+            Mode = SelectMode;
+            LCDScreenIndex = Screen_4;
+          }
+          break;
+          case TimeSet_Hint:{
+            Mode = TimeSetMode;
+            LCDScreenIndex = Screen_5;            
+          }
+          break; 
+          case Dry_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                    
         }
       }
       if (enc1.isLeft())
       {
         Serial.println("Left");         // если был поворот
         switch (Mode) {
-          case IntroMode: 
-          {
+          case IntroMode: {
             LCDScreenIndex = Screen_2;
             InfoScreen_TimeOut = 100; // 10 секундный таймер переустановлен             
           }
           break;
-          case SelectMode: 
-          {
-            
+          case SelectMode: {
+            if ( PlasticType_index > PlasticType_index_min )
+              PlasticType_index--;
           }
           break;
-          case TimeSetMode: 
-          {
-            
+          case TimeSetMode:{
+            if ( WaitTime_5min_step != 0 )
+              WaitTime_5min_step--;
           }
           break;
           case WaitMode: 
           case DryMode: 
-          case DoneMode: 
-          {
-            
+          case DoneMode: {
+            Mode = Dry_Hint;
+            LCDScreenIndex = Screen_10;
           }
-          break;                                                       
+          break;   
+          case Intro_Hint:{
+            //nothing to do
+          }
+          break; 
+          case Select_Hint:{
+            Mode = SelectMode;
+            LCDScreenIndex = Screen_4;
+          }
+          break;
+          case TimeSet_Hint:{
+            Mode = TimeSetMode;
+            LCDScreenIndex = Screen_5;            
+          }
+          break; 
+          case Dry_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                       
         }
       }
       if (enc1.isHolded())
       {
         Serial.println("Hold");         
         switch (Mode) {
-          case IntroMode: 
-          {
+          case IntroMode:{
             Mode = WaitMode;
             LCDScreenIndex = Screen_6;
-
           }
           break;
-          case SelectMode: 
-          {
-            
+          case SelectMode: {
+            Mode = WaitMode;
+            LCDScreenIndex = Screen_6;            
           }
           break;
-          case TimeSetMode: 
-          {
-            
+          case TimeSetMode:{
+            Mode = WaitMode;
+            LCDScreenIndex = Screen_6;                        
           }
           break;
           case WaitMode: 
           case DryMode: 
-          case DoneMode: 
-          {
-            
+          case DoneMode:{
+            Mode = SelectMode; 
+            LCDScreenIndex = Screen_4;                                            
           }
-          break;                                                       
+          break; 
+          case Intro_Hint:
+          case Select_Hint:
+          case TimeSet_Hint:
+          {
+            Mode = WaitMode;
+            LCDScreenIndex = Screen_6;             
+          }
+          break; 
+          case Dry_Hint:{
+            Mode = SelectMode;
+            LCDScreenIndex = Screen_4;            
+          }
+          break;                                                                                                                      
         }
       }      
       if (enc1.isClick())
@@ -257,21 +326,41 @@ void handler_10Hz() {
           break;
           case SelectMode: 
           {
-            
+            Mode = TimeSetMode;                        
+            LCDScreenIndex = Screen_5;
           }
           break;
           case TimeSetMode: 
           {
-            
+            Mode = SelectMode;                        
+            LCDScreenIndex = Screen_4;
           }
           break;
           case WaitMode: 
           case DryMode: 
-          case DoneMode: 
-          {
-            
+          case DoneMode: {
+            Mode = Dry_Hint;
+            LCDScreenIndex = Screen_10;
           }
-          break;                                                       
+          break;   
+          case Intro_Hint:{
+            //nothing to do
+          }
+          break; 
+          case Select_Hint:{
+            Mode = SelectMode;
+            LCDScreenIndex = Screen_4;
+          }
+          break;
+          case TimeSet_Hint:{
+            Mode = TimeSetMode;
+            LCDScreenIndex = Screen_5;            
+          }
+          break; 
+          case Dry_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                  
         }
       } 
     }
@@ -317,10 +406,37 @@ void handler_10Hz() {
       break; 
     case 9: 
     {
+      if ( Mode == SelectMode )
+      {
       lcd.setCursor(0, 0);  
       lcd.print(Menus[LCDScreenIndex*2]); 
       lcd.setCursor(0, 1);  
-      lcd.print(Menus[LCDScreenIndex*2+1]);
+      lcd.print(Menus[LCDScreenIndex*2+1]);        
+      }
+      else if ( Mode == TimeSetMode )
+      {
+      lcd.setCursor(0, 0);  
+      lcd.print(Menus[LCDScreenIndex*2]); 
+      lcd.setCursor(0, 1);
+      TotalTime =  WaitTime_5min_step * 5 + DryTime[PlasticType_index];       
+      Hours = TotalTime/60;
+      Minutes = TotalTime - Hours * 60;
+      if (Hours < 10 )
+        lcd.print(" ");
+      lcd.print(Hours);
+      lcd.print(" hours ");
+      if (Minutes < 10 )
+        lcd.print(" ");
+      lcd.print(Minutes);
+      lcd.print(" min");                             
+      }
+      else
+      {
+      lcd.setCursor(0, 0);  
+      lcd.print(Menus[LCDScreenIndex*2]); 
+      lcd.setCursor(0, 1);  
+      lcd.print(PlasticSelect_Menu[PlasticType_index]);
+      }      
     }
       break;                             
     case 10:       
