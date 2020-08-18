@@ -1,7 +1,7 @@
 
 #include <GyverTimer1.h>
-
 #include "GyverEncoder.h"
+
 #define CLK 8
 #define DT 7
 #define SW 6
@@ -90,16 +90,11 @@ void setup() {
   pinMode(PowerRele_pin, OUTPUT);       //
   digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
 
-//  lcd.setCursor(0, 0);  
-//  lcd.print("Rele Off        "); 
-
   lcd.setCursor(0, 0);  
   lcd.print(Menus[0]); 
   lcd.setCursor(0, 1);  
   lcd.print(Menus[1]); 
   
-
-
   pinMode(buzzer, OUTPUT); // Set buzzer - pin 13 as an output
 
   timer1_setFrequency(1000);    // ставим 10 герца
@@ -149,7 +144,9 @@ unsigned char PlasticType_index = 0;
 unsigned int WaitTime_5min_step = 0;
 #define WaitTime_5min_step_Max 288
 unsigned int    TotalTime; 
-const unsigned char DryTime[4] = {10, 20, 30, 40};       
+const unsigned char DryTime[4] = {10, 20, 30, 40};
+const unsigned char DryTemp[4] = {50, 60, 70, 80};
+         
 unsigned char       Hours;
 unsigned char       Minutes;
 
@@ -166,23 +163,19 @@ void handler_10Hz() {
   switch (InSecondCounter) {
     case 1: {
       dallas_requestTemp(DS_PIN); // запрос на начало изменения температуры
-      if ( 0 == InfoScreen_TimeOut ) 
-      { 
-        if (IntroMode == Mode )
-        {
+      if ( 0 == InfoScreen_TimeOut ) { 
+        if (IntroMode == Mode ) {
           LCDScreenIndex = Screen_1;
         }      
       }
-      else 
-      {
+      else {
          InfoScreen_TimeOut--;
       }
     }
     break;
     case 2: {
       enc1.tick();     // отработка теперь находится здесь
-      if (enc1.isRight())
-      {
+      if (enc1.isRight()) {
         Serial.println("Right");         // если был поворот
         switch (Mode) {
           case IntroMode: {
@@ -227,13 +220,12 @@ void handler_10Hz() {
           break;                                                                                                                    
         }
       }
-      if (enc1.isLeft())
-      {
+      if (enc1.isLeft()) {
         Serial.println("Left");         // если был поворот
         switch (Mode) {
           case IntroMode: {
             LCDScreenIndex = Screen_2;
-            InfoScreen_TimeOut = 100; // 10 секундный таймер переустановлен             
+            InfoScreen_TimeOut = 100;             
           }
           break;
           case SelectMode: {
@@ -273,8 +265,7 @@ void handler_10Hz() {
           break;                                                                                                                       
         }
       }
-      if (enc1.isHolded())
-      {
+      if (enc1.isHolded()) {
         Serial.println("Hold");         
         switch (Mode) {
           case IntroMode:{
@@ -314,24 +305,20 @@ void handler_10Hz() {
           break;                                                                                                                      
         }
       }      
-      if (enc1.isClick())
-      {
+      if (enc1.isClick()) {
         Serial.println("Click");   
         switch (Mode) {
-          case IntroMode: 
-          {
+          case IntroMode: {
             Mode = SelectMode;
             LCDScreenIndex = Screen_4;
           }
           break;
-          case SelectMode: 
-          {
+          case SelectMode: {
             Mode = TimeSetMode;                        
             LCDScreenIndex = Screen_5;
           }
           break;
-          case TimeSetMode: 
-          {
+          case TimeSetMode: {
             Mode = SelectMode;                        
             LCDScreenIndex = Screen_4;
           }
@@ -372,25 +359,20 @@ void handler_10Hz() {
     case 5: 
     {
       Current_tempr_value = dallas_getTemp(DS_PIN);
-      if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) 
-      {
+      if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) {
         digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
         PowerRele_State = OFF;
         // todo Go to sensor Error Mode
       } 
-      else if ( Mode == WaitMode ) 
-      {        
+      else if ( Mode == WaitMode ) {        
         // todo Update temperature value on LCD string       
       }      
-      else if ( Mode == DryMode ) 
-      { 
-        if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
-        {
+      else if ( Mode == DryMode )  { 
+        if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   ) {
           PowerRele_State = OFF;
           digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
         }
-        else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State)   )
-        {
+        else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State) ) {
           PowerRele_State = ON;
           digitalWrite(PowerRele_pin, LOW);   // turn Rele ON 
         }
@@ -406,36 +388,33 @@ void handler_10Hz() {
       break; 
     case 9: 
     {
-      if ( Mode == SelectMode )
-      {
-      lcd.setCursor(0, 0);  
-      lcd.print(Menus[LCDScreenIndex*2]); 
-      lcd.setCursor(0, 1);  
-      lcd.print(Menus[LCDScreenIndex*2+1]);        
+      if ( Mode == SelectMode )  {
+        lcd.setCursor(0, 0);  
+        lcd.print(Menus[LCDScreenIndex*2]); 
+        lcd.setCursor(0, 1);  
+        lcd.print(Menus[LCDScreenIndex*2+1]);        
       }
-      else if ( Mode == TimeSetMode )
-      {
-      lcd.setCursor(0, 0);  
-      lcd.print(Menus[LCDScreenIndex*2]); 
-      lcd.setCursor(0, 1);
-      TotalTime =  WaitTime_5min_step * 5 + DryTime[PlasticType_index];       
-      Hours = TotalTime/60;
-      Minutes = TotalTime - Hours * 60;
-      if (Hours < 10 )
-        lcd.print(" ");
-      lcd.print(Hours);
-      lcd.print(" hours ");
-      if (Minutes < 10 )
-        lcd.print(" ");
-      lcd.print(Minutes);
-      lcd.print(" min");                             
+      else if ( Mode == TimeSetMode ) {
+        lcd.setCursor(0, 0);  
+        lcd.print(Menus[LCDScreenIndex*2]); 
+        lcd.setCursor(0, 1);
+        TotalTime =  WaitTime_5min_step * 5 + DryTime[PlasticType_index];       
+        Hours = TotalTime/60;
+        Minutes = TotalTime - Hours * 60;
+        if (Hours < 10 )
+          lcd.print(" ");
+        lcd.print(Hours);
+        lcd.print(" hours ");
+        if (Minutes < 10 )
+          lcd.print(" ");
+        lcd.print(Minutes);
+        lcd.print(" min");                             
       }
-      else
-      {
-      lcd.setCursor(0, 0);  
-      lcd.print(Menus[LCDScreenIndex*2]); 
-      lcd.setCursor(0, 1);  
-      lcd.print(PlasticSelect_Menu[PlasticType_index]);
+      else {
+        lcd.setCursor(0, 0);  
+        lcd.print(Menus[LCDScreenIndex*2]); 
+        lcd.setCursor(0, 1);  
+        lcd.print(PlasticSelect_Menu[PlasticType_index]);
       }      
     }
       break;                             
@@ -453,6 +432,7 @@ void loop() {
 //  if (enc1.isClick()) Serial.println("Click");         // одиночный клик
 }
 /*
+ 
  void loop() 
 {
 
