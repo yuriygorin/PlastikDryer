@@ -92,7 +92,7 @@ void setup() {
 
   pinMode(buzzer, OUTPUT); // Set buzzer - pin 13 as an output
 
-  timer1_setFrequency(10);    // ставим 10 герца
+  timer1_setFrequency(1000);    // ставим 10 герца
   timer1_ISR(handler_10Hz);    // подключить прерывание
   timer1_start();         // запустить таймер
 }
@@ -103,8 +103,10 @@ void setup() {
 char InSecondCounter = 0;
 unsigned char LCDScreenIndex = 0;
 float Current_tempr_value;
-unsigned char Mode;
+unsigned char Mode = 1;
 unsigned char CurrentScreen = 0;
+unsigned int InfoScreen_TimeOut = 0;
+
 #define IntroMode     1
 #define SelectMode    2
 #define TimeSetMode   3
@@ -122,7 +124,6 @@ unsigned char CurrentScreen = 0;
 #define Screen_8      7
 #define Screen_9      8
 
-unsigned char InfoScreen_TimeOut = 0;
 
 
 
@@ -140,14 +141,16 @@ void handler_10Hz() {
     case 1: 
     {
       dallas_requestTemp(DS_PIN); // запрос на начало изменения температуры
-      if ( 0 != InfoScreen_TimeOut ) 
-      {
-        InfoScreen_TimeOut--;
+      if ( 0 == InfoScreen_TimeOut ) 
+      { 
+        if (IntroMode == Mode )
+        {
+          LCDScreenIndex = Screen_1;
+        }      
       }
       else 
       {
-        if (IntroMode == Mode )
-          LCDScreenIndex = Screen_1;
+         InfoScreen_TimeOut--;
       }
     }
     break;
@@ -189,7 +192,7 @@ void handler_10Hz() {
         switch (Mode) {
           case IntroMode: 
           {
-            LCDScreenIndex = Screen_1;
+            LCDScreenIndex = Screen_2;
             InfoScreen_TimeOut = 100; // 10 секундный таймер переустановлен             
           }
           break;
@@ -219,6 +222,8 @@ void handler_10Hz() {
           case IntroMode: 
           {
             Mode = WaitMode;
+            LCDScreenIndex = Screen_6;
+
           }
           break;
           case SelectMode: 
@@ -247,6 +252,7 @@ void handler_10Hz() {
           case IntroMode: 
           {
             Mode = SelectMode;
+            LCDScreenIndex = Screen_4;
           }
           break;
           case SelectMode: 
@@ -325,10 +331,10 @@ void handler_10Hz() {
 
 void loop() {
   enc1.tick();     // отработка теперь находится здесь
-  if (enc1.isRight()) Serial.println("Right");         // если был поворот
-  if (enc1.isLeft()) Serial.println("Left");
-  if (enc1.isHolded()) Serial.println("Holded");       // если была удержана и энк не поворачивался
-  if (enc1.isClick()) Serial.println("Click");         // одиночный клик
+//  if (enc1.isRight()) Serial.println("Right");         // если был поворот
+//  if (enc1.isLeft()) Serial.println("Left");
+//  if (enc1.isHolded()) Serial.println("Holded");       // если была удержана и энк не поворачивался
+//  if (enc1.isClick()) Serial.println("Click");         // одиночный клик
 }
 /*
  void loop() 
