@@ -94,7 +94,6 @@ void setup() {
   lcd.print(Menus[0]); 
   lcd.setCursor(0, 1);  
   lcd.print(Menus[1]); 
-  
   pinMode(buzzer, OUTPUT); // Set buzzer - pin 13 as an output
 
   timer1_setFrequency(100);    // ставим 10 герца
@@ -123,7 +122,7 @@ unsigned int InfoScreen_TimeOut = 0;
 #define TimeSet_Hint  9
 #define Wait_Hint     10
 #define Dry_Hint      11
-#define DoneMode_Hint     12
+#define Done_Hint     12
 
 
 #define Screen_1      0
@@ -164,9 +163,10 @@ void handler_10Hz() {
     case 1: {
       dallas_requestTemp(DS_PIN); // запрос на начало изменения температуры
       if ( 0 == InfoScreen_TimeOut ) { 
-        if (IntroMode == Mode ) {
-          LCDScreenIndex = Screen_1;
-        }      
+        if      (IntroMode == Mode ) { LCDScreenIndex = Screen_1; }
+        else if (Wait_Hint == Mode ) { LCDScreenIndex = Screen_6; Mode = WaitMode; }
+        else if (Dry_Hint  == Mode ) { LCDScreenIndex = Screen_7; Mode = DryMode;  }
+        else if (Done_Hint == Mode ) { LCDScreenIndex = Screen_8; Mode = DoneMode; }             
       }
       else {
          InfoScreen_TimeOut--;
@@ -214,10 +214,18 @@ void handler_10Hz() {
             LCDScreenIndex = Screen_5;            
           }
           break; 
+          case Wait_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                       
           case Dry_Hint:{
             //nothing to do            
           }
-          break;                                                                                                                    
+          break;                                                                                                                       
+          case Done_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                      
         }
       }
       if (enc1.isLeft()) {
@@ -243,6 +251,7 @@ void handler_10Hz() {
           case DoneMode: {
             Mode = Dry_Hint;
             LCDScreenIndex = Screen_10;
+            InfoScreen_TimeOut = 100;                         
           }
           break;   
           case Intro_Hint:{
@@ -259,7 +268,15 @@ void handler_10Hz() {
             LCDScreenIndex = Screen_5;            
           }
           break; 
+          case Wait_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                       
           case Dry_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                       
+          case Done_Hint:{
             //nothing to do            
           }
           break;                                                                                                                       
@@ -298,7 +315,9 @@ void handler_10Hz() {
             LCDScreenIndex = Screen_6;             
           }
           break; 
-          case Dry_Hint:{
+          case Wait_Hint:          
+          case Dry_Hint:
+          case Done_Hint:{
             Mode = SelectMode;
             LCDScreenIndex = Screen_4;            
           }
@@ -344,7 +363,15 @@ void handler_10Hz() {
             LCDScreenIndex = Screen_5;            
           }
           break; 
+          case Wait_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                       
           case Dry_Hint:{
+            //nothing to do            
+          }
+          break;                                                                                                                       
+          case Done_Hint:{
             //nothing to do            
           }
           break;                                                                                                  
@@ -471,6 +498,40 @@ void loop() {
   lcd.print(TargetTemperature + TemperatureWindow);  
   lcd.print("C");
 }
+
+
+uint8_t tochki[8] = {B0, B00000, B0, B0, B0, B0, B10101};
+uint8_t bukva_P[8] = {0x1F, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11};
+uint8_t bukva_Ya[8] = {B01111, B10001, B10001, B01111, B00101, B01001, B10001};
+uint8_t bukva_L[8] = {0x3, 0x7, 0x5, 0x5, 0xD, 0x9, 0x19};
+uint8_t bukva_Lm[8] = {0, 0, B01111, B00101, B00101, B10101, B01001};
+uint8_t bukva_Mz[8] = {0x10, 0x10, 0x10, 0x1E, 0x11, 0x11, 0x1E};
+uint8_t bukva_I[8] = {0x11, 0x13, 0x13, 0x15, 0x19, 0x19, 0x11};
+uint8_t bukva_D[8] = {B01111, B00101, B00101, B01001, B10001, B11111, 0x11};
+uint8_t bukva_G[8] = {B11111, B10001, B10000, B10000, B10000, B10000, B10000};
+uint8_t bukva_IY[8] = {B01110, B00000, B10001, B10011, B10101, B11001, B10001};
+uint8_t bukva_Z[8] = {B01110, B10001, B00001, B00010, B00001, B10001, B01110};
+uint8_t bukva_ZH[8] = {B10101, B10101, B10101, B11111, B10101, B10101, B10101};
+uint8_t bukva_Y[8] = {B10001, B10001, B10001, B01010, B00100, B01000, B10000};
+uint8_t bukva_B[8] = {B11110, B10000, B10000, B11110, B10001, B10001, B11110};
+uint8_t bukva_CH[8] = {B10001, B10001, B10001, B01111, B00001, B00001, B00001};
+uint8_t bukva_IYI[8] = {B10001, B10001, B10001, B11001, B10101, B10101, B11001};
+uint8_t bukva_TS[8] = {B10010, B10010, B10010, B10010, B10010, B10010, B11111, B00001};
+
+
+  // create a new character
+  lcd.createChar(0, heart);
+  // create a new character
+  lcd.createChar(1, smiley);
+  // create a new character
+  lcd.createChar(2, frownie);
+  // create a new character
+  lcd.createChar(3, armsDown);
+  // create a new character
+  lcd.createChar(4, armsUp);
+
+  
+
 
 */
 //Далее следует кусок чужого кода, который заявлен как самый легкий и быстрый для опроа датчика температуры
