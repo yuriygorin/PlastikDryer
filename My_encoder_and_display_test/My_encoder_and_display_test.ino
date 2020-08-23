@@ -157,9 +157,10 @@ unsigned int WaitTime_5min_step = 0;
 unsigned int    TotalTime; 
 const unsigned char DryTime[4] = {10, 20, 30, 40};
 const unsigned char DryTemp[4] = {50, 60, 70, 80};
+unsigned long WaitTime_01sec_step=0, DryTime_01sec_step = 0;
+
          
-unsigned char       Hours;
-unsigned char       Minutes;
+unsigned char       Hours,Minutes, Seconds;
 volatile unsigned int TimerUpdated = false, InSecondCounter;
 
 void handler_10Hz() {
@@ -198,6 +199,7 @@ void loop() {
       case DoneMode: {
         Mode = Dry_Hint;
         LCDScreenIndex = Screen_10;
+        InfoScreen_TimeOut = InfoScreen_TimeOut_recharge;                                 
       }
       break;   
       case Intro_Hint:{
@@ -350,6 +352,7 @@ void loop() {
       case DoneMode: {
         Mode = Dry_Hint;
         LCDScreenIndex = Screen_10;
+        InfoScreen_TimeOut = InfoScreen_TimeOut_recharge;                                 
       }
       break;   
       case Intro_Hint:{
@@ -383,43 +386,102 @@ void loop() {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (true == TimerUpdated){    
     TimerUpdated = false;
-           {
-        if ( Mode == SelectMode )  {
-          lcd.setCursor(0, 0);  
-          lcd.print(Menus[Screen_4*2]);
-          enc1.tick();     // отработка теперь находится здесь 
-          lcd.setCursor(0, 1);  
-          lcd.print(PlasticSelect_Menu[PlasticType_index]);
-          enc1.tick();     // отработка теперь находится здесь               
-        }
-        else if ( Mode == TimeSetMode ) {
-          lcd.setCursor(0, 0);  
-          lcd.print(Menus[LCDScreenIndex*2]);
-          enc1.tick(); 
-          lcd.setCursor(0, 1);
-          TotalTime =  WaitTime_5min_step * 5 + DryTime[PlasticType_index];       
-          Hours = TotalTime/60;
-          Minutes = TotalTime - Hours * 60;
-          if (Hours < 10 )
-            lcd.print(" ");
-          lcd.print(Hours);
-          lcd.print(" hours ");
-          if (Minutes < 10 )
-            lcd.print(" ");
-          lcd.print(Minutes);
-          lcd.print(" min "); 
-          enc1.tick();                                    
-        }
-        else {
-          lcd.setCursor(0, 0);  
-          lcd.print(Menus[LCDScreenIndex*2]);
-          enc1.tick(); 
-          lcd.setCursor(0, 1);  
-          lcd.print(Menus[LCDScreenIndex*2+1]);
-          enc1.tick();
-          }      
+    if ( Mode == SelectMode )  {
+      lcd.setCursor(0, 0);  
+      lcd.print(Menus[Screen_4*2]);
+      enc1.tick();     // отработка теперь находится здесь 
+      lcd.setCursor(0, 1);  
+      lcd.print(PlasticSelect_Menu[PlasticType_index]);
+      enc1.tick();     // отработка теперь находится здесь               
+    }
+    else if ( Mode == TimeSetMode ) {
+      lcd.setCursor(0, 0);  
+      lcd.print(Menus[LCDScreenIndex*2]);
+      lcd.setCursor(0, 1);
+      TotalTime =  WaitTime_5min_step * 5 + DryTime[PlasticType_index];       
+      Hours   = TotalTime/60;
+      Minutes = TotalTime - Hours * 60;
+      if (Hours < 10 )
+        lcd.print(" ");
+      lcd.print(Hours);
+      lcd.print(" hours ");
+      if (Minutes < 10 )
+        lcd.print(" ");
+      lcd.print(Minutes);
+      lcd.print(" min "); 
+      WaitTime_01sec_step =  WaitTime_5min_step * 5 * 600;                               
+    }
+    else if (Mode == WaitMode){
+      if (WaitTime_01sec_step == 0) {
+        Mode = DryMode;
+        DryTime_01sec_step = DryTime[PlasticType_index] * 600;
       }
-
+      else {
+        WaitTime_01sec_step--;
+        lcd.setCursor(0, 0);  
+        lcd.print("  Waiting  ");
+        if (Current_tempr_value < 10 )
+          lcd.print(" ");
+        lcd.print(Current_tempr_value);        
+        lcd.print("oC ");    
+        lcd.setCursor(0, 1);
+        lcd.print("  Left  ");
+        Hours   =  WaitTime_01sec_step / 36000;
+        Minutes = (WaitTime_01sec_step - Hours * 3600) /600; 
+        Seconds = (WaitTime_01sec_step -  Hours * 3600 - Minutes * 600 ) / 10;
+        if (Hours < 10 )
+          lcd.print(" ");
+        lcd.print(Hours);
+        lcd.print(":");
+        if (Minutes < 10 )
+          lcd.print(" ");
+        lcd.print(Minutes);  
+        lcd.print(":");
+        if (Seconds < 10 )
+          lcd.print(" ");
+        lcd.print(Seconds);       
+      }                
+    }
+    else if (Mode == DryMode){
+      if (DryTime_01sec_step == 0) {
+        Mode = DoneMode;
+        LCDScreenIndex = Screen_8;
+      }
+      else {
+        DryTime_01sec_step--;
+        lcd.setCursor(0, 0);  
+        lcd.print("  Drying  ");
+        if (Current_tempr_value < 10 )
+          lcd.print(" ");
+        lcd.print(Current_tempr_value);        
+        lcd.print("oC ");    
+        lcd.setCursor(0, 1);
+        lcd.print("  Left  ");
+        Hours   =  DryTime_01sec_step / 36000;
+        Minutes = (DryTime_01sec_step - Hours * 3600) /600; 
+        Seconds = (DryTime_01sec_step -  Hours * 3600 - Minutes * 600 ) / 10;
+        if (Hours < 10 )
+          lcd.print(" ");
+        lcd.print(Hours);
+        lcd.print(":");
+        if (Minutes < 10 )
+          lcd.print(" ");
+        lcd.print(Minutes);  
+        lcd.print(":");
+        if (Seconds < 10 )
+          lcd.print(" ");
+        lcd.print(Seconds);    
+      }                   
+    }    
+    else {
+      lcd.setCursor(0, 0);  
+      lcd.print(Menus[LCDScreenIndex*2]);
+      enc1.tick(); 
+      lcd.setCursor(0, 1);  
+      lcd.print(Menus[LCDScreenIndex*2+1]);
+      enc1.tick();
+    }
+            
     switch (InSecondCounter) {
       case Time4CountTime: {
         if ( 0 == InfoScreen_TimeOut ) { 
@@ -449,34 +511,33 @@ void loop() {
         }          
       }
       break;
-      case Time4TempMeasure: 
-      {
+      case Time4TempMeasure: {
         Current_tempr_value = dallas_getTemp(DS_PIN);
         dallas_requestTemp(DS_PIN); // запрос на начало изменения температуры
         if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) {
           digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
           PowerRele_State = OFF;
           // todo Go to sensor Error Mode
-        } 
-        else if ( Mode == WaitMode ) {        
-          // todo Update temperature value on LCD string       
-        }      
+        }       
         else if ( Mode == DryMode )  { 
-          if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   ) {
+          if ( (Current_tempr_value >= DryTemp[PlasticType_index] + TemperatureWindow) &&  ( ON == PowerRele_State)   ) {
             PowerRele_State = OFF;
             digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
           }
-          else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State) ) {
+          else if ( (Current_tempr_value < DryTemp[PlasticType_index] - TemperatureWindow) &&  ( OFF == PowerRele_State) ) {
             PowerRele_State = ON;
             digitalWrite(PowerRele_pin, LOW);   // turn Rele ON 
           }
-          //todo Update temperature value on LCD string
+        }
+        else {        
+          PowerRele_State = OFF;
+          digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off       
         }
       }      
-        break;                           
-        case Time4ResetTimerCounter: 
-          InSecondCounter = 0;          
-        break;
+      break;                           
+      case Time4ResetTimerCounter: 
+        InSecondCounter = 0;          
+      break;
     }
   }
 }
