@@ -428,17 +428,17 @@ void loop() {
         lcd.print("  Left  ");
         Hours   =  WaitTime_01sec_step / 36000;
         Minutes = (WaitTime_01sec_step - Hours * 3600) /600; 
-        Seconds = (WaitTime_01sec_step -  Hours * 3600 - Minutes * 600 ) / 10;
+        Seconds = (WaitTime_01sec_step - Hours * 3600 - Minutes * 600 ) / 10;
         if (Hours < 10 )
           lcd.print(" ");
         lcd.print(Hours);
         lcd.print(":");
         if (Minutes < 10 )
-          lcd.print(" ");
+          lcd.print("0");
         lcd.print(Minutes);  
         lcd.print(":");
         if (Seconds < 10 )
-          lcd.print(" ");
+          lcd.print("0");
         lcd.print(Seconds);       
       }                
     }
@@ -459,17 +459,17 @@ void loop() {
         lcd.print("  Left  ");
         Hours   =  DryTime_01sec_step / 36000;
         Minutes = (DryTime_01sec_step - Hours * 3600) /600; 
-        Seconds = (DryTime_01sec_step -  Hours * 3600 - Minutes * 600 ) / 10;
+        Seconds = (DryTime_01sec_step - Hours * 3600 - Minutes * 600 ) / 10;
         if (Hours < 10 )
           lcd.print(" ");
         lcd.print(Hours);
         lcd.print(":");
         if (Minutes < 10 )
-          lcd.print(" ");
+          lcd.print("0");
         lcd.print(Minutes);  
         lcd.print(":");
         if (Seconds < 10 )
-          lcd.print(" ");
+          lcd.print("0");
         lcd.print(Seconds);    
       }                   
     }    
