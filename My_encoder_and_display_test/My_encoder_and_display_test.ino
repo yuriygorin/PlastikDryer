@@ -9,7 +9,6 @@
 Encoder enc1(CLK, DT, SW);  // для работы c кнопкой
 
 
-
 // include the library code:
 #include <LiquidCrystal.h>
 
@@ -541,82 +540,275 @@ void loop() {
     }
   }
 }
-/*
+
+
+//https://robotchip.ru/russkie-simvoly-na-lcd1602a/
+//
+//Тестирование производилось на Arduino IDE 1.6.12
+//Дата тестирования 08.12.2016г.
+//
+// 
+//#include <Wire.h>                 // Подключаем библиотеку Wire
+//#include <LiquidCrystal_I2C.h>    // Подключаем библиотеку LiquidCrystal_I2C
+//
+//byte bukva_B[8]   = {B11110,B10000,B10000,B11110,B10001,B10001,B11110,B00000,}; // Буква "Б"
+//byte bukva_G[8]   = {B11111,B10001,B10000,B10000,B10000,B10000,B10000,B00000,}; // Буква "Г"
+//byte bukva_D[8]   = {B01111,B00101,B00101,B01001,B10001,B11111,B10001,B00000,}; // Буква "Д"
+//byte bukva_ZH[8]  = {B10101,B10101,B10101,B11111,B10101,B10101,B10101,B00000,}; // Буква "Ж"
+//byte bukva_Z[8]   = {B01110,B10001,B00001,B00010,B00001,B10001,B01110,B00000,}; // Буква "З"
+//byte bukva_I[8]   = {B10001,B10011,B10011,B10101,B11001,B11001,B10001,B00000,}; // Буква "И"
+//byte bukva_IY[8]  = {B01110,B00000,B10001,B10011,B10101,B11001,B10001,B00000,}; // Буква "Й"
+//byte bukva_L[8]   = {B00011,B00111,B00101,B00101,B01101,B01001,B11001,B00000,}; // Буква "Л"
+//byte bukva_P[8]   = {B11111,B10001,B10001,B10001,B10001,B10001,B10001,B00000,}; // Буква "П"
+//byte bukva_Y[8]   = {B10001,B10001,B10001,B01010,B00100,B01000,B10000,B00000,}; // Буква "У"
+//byte bukva_F[8]   = {B00100,B11111,B10101,B10101,B11111,B00100,B00100,B00000,}; // Буква "Ф"
+//byte bukva_TS[8]  = {B10010,B10010,B10010,B10010,B10010,B10010,B11111,B00001,}; // Буква "Ц"
+//byte bukva_CH[8]  = {B10001,B10001,B10001,B01111,B00001,B00001,B00001,B00000,}; // Буква "Ч"
+//byte bukva_Sh[8]  = {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00000,}; // Буква "Ш"
+//byte bukva_Shch[8]= {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00001,}; // Буква "Щ"
+//byte bukva_Mz[8]  = {B10000,B10000,B10000,B11110,B10001,B10001,B11110,B00000,}; // Буква "Ь"
+//byte bukva_IYI[8] = {B10001,B10001,B10001,B11001,B10101,B10101,B11001,B00000,}; // Буква "Ы"
+//byte bukva_Yu[8]  = {B10010,B10101,B10101,B11101,B10101,B10101,B10010,B00000,}; // Буква "Ю"
+//byte bukva_Ya[8]  = {B01111,B10001,B10001,B01111,B00101,B01001,B10001,B00000,}; // Буква "Я"
+//
+//LiquidCrystal_I2C lcd(0x27,16,2); // Задаем адрес и размерность дисплея.
+//
+//void setup()
+//{
+//  lcd.init();                     // Инициализация lcd дисплея
+//  lcd.backlight();                // Включение подсветки дисплея
+//}
+//
+//void loop()
+//{
+// lcd.createChar(1, bukva_P);      // Создаем символ под номером 1
+// lcd.createChar(2, bukva_I);      // Создаем символ под номером 2
+// 
+///*
+//Для наглядности, вывод символом указал отдельно, 
+//можно минимизировать: lcd.print("\1P\2BET M\2P");
+//*/
+//
+// lcd.setCursor(3, 0);             // Устанавливаем курсор на 1 строку ячейку 3
+// lcd.print("\1");                 // Выводим букву "П"
+// lcd.setCursor(4, 0);             // Устанавливаем курсор на 1 строку ячейку 4
+// lcd.print("P");                  // Выводим букву "P"
+// lcd.setCursor(5, 0);             // Устанавливаем курсор на 1 строку ячейку 5
+// lcd.print("\2");                 // Выводим букву "И"
+// lcd.setCursor(6, 0);             // Устанавливаем курсор на 1 строку ячейку 6
+// lcd.print("B");                  // Выводим букву "B"
+// lcd.setCursor(7, 0);             // Устанавливаем курсор на 1 строку ячейку 7
+// lcd.print("E");                  // Выводим букву "E"
+// lcd.setCursor(8, 0);             // Устанавливаем курсор на 1 строку ячейку 8
+// lcd.print("T");                  // Выводим букву "T"
+// lcd.setCursor(10, 0);            // Устанавливаем курсор на 1 строку ячейку 10
+// lcd.print("M");                  // Выводим букву "М"
+// lcd.setCursor(11, 0);            // Устанавливаем курсор на 1 строку ячейку 11
+// lcd.print("\2");                 // Выводим букву "И"
+// lcd.setCursor(12, 0);            // Устанавливаем курсор на 1 строку ячейку 12
+// lcd.print("P");                  // Выводим букву "P"
+// 
+// lcd.setCursor(2, 1);             // Устанавливаем курсор на 2 строку ячейку 2
+// lcd.print ("www.rchip.ru") ;     // Выводим текст
+//}
+
+//
+//Тестирование производилось на Arduino IDE 1.6.12
+//Дата тестирования 08.12.2016г.
+//
+// 
+//#include <Wire.h>                 // Подключаем библиотеку Wire
+//#include <LiquidCrystal_I2C.h>    // Подключаем библиотеку LiquidCrystal_I2C
+// 
+//byte bukva_B[8]   = {B11110,B10000,B10000,B11110,B10001,B10001,B11110,B00000,}; // Буква "Б"
+//byte bukva_G[8]   = {B11111,B10001,B10000,B10000,B10000,B10000,B10000,B00000,}; // Буква "Г"
+//byte bukva_D[8]   = {B01111,B00101,B00101,B01001,B10001,B11111,B10001,B00000,}; // Буква "Д"
+//byte bukva_ZH[8]  = {B10101,B10101,B10101,B11111,B10101,B10101,B10101,B00000,}; // Буква "Ж"
+//byte bukva_Z[8]   = {B01110,B10001,B00001,B00010,B00001,B10001,B01110,B00000,}; // Буква "З"
+//byte bukva_I[8]   = {B10001,B10011,B10011,B10101,B11001,B11001,B10001,B00000,}; // Буква "И"
+//byte bukva_IY[8]  = {B01110,B00000,B10001,B10011,B10101,B11001,B10001,B00000,}; // Буква "Й"
+//byte bukva_L[8]   = {B00011,B00111,B00101,B00101,B01101,B01001,B11001,B00000,}; // Буква "Л"
+//byte bukva_P[8]   = {B11111,B10001,B10001,B10001,B10001,B10001,B10001,B00000,}; // Буква "П"
+//byte bukva_Y[8]   = {B10001,B10001,B10001,B01010,B00100,B01000,B10000,B00000,}; // Буква "У"
+//byte bukva_F[8]   = {B00100,B11111,B10101,B10101,B11111,B00100,B00100,B00000,}; // Буква "Ф"
+//byte bukva_TS[8]  = {B10010,B10010,B10010,B10010,B10010,B10010,B11111,B00001,}; // Буква "Ц"
+//byte bukva_CH[8]  = {B10001,B10001,B10001,B01111,B00001,B00001,B00001,B00000,}; // Буква "Ч"
+//byte bukva_Sh[8]  = {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00000,}; // Буква "Ш"
+//byte bukva_Shch[8]= {B10101,B10101,B10101,B10101,B10101,B10101,B11111,B00001,}; // Буква "Щ"
+//byte bukva_Mz[8]  = {B10000,B10000,B10000,B11110,B10001,B10001,B11110,B00000,}; // Буква "Ь"
+//byte bukva_IYI[8] = {B10001,B10001,B10001,B11001,B10101,B10101,B11001,B00000,}; // Буква "Ы"
+//byte bukva_Yu[8]  = {B10010,B10101,B10101,B11101,B10101,B10101,B10010,B00000,}; // Буква "Ю"
+//byte bukva_Ya[8]  = {B01111,B10001,B10001,B01111,B00101,B01001,B10001,B00000,}; // Буква "Я"
+// 
+//LiquidCrystal_I2C lcd(0x27,16,2); // Задаем адрес и размерность дисплея.
+// 
+//void setup()
+//{
+//  lcd.init();                     // Инициализация lcd дисплея
+//  lcd.backlight();                // Включение подсветки дисплея
+//}
+// 
+//void loop()
+//{
+// lcd.createChar(1, bukva_P);      // Создаем символ под номером 1
+// lcd.createChar(2, bukva_I);      // Создаем символ под номером 2
+// 
+//
+//Для наглядности, вывод символом указал отдельно, 
+//можно минимизировать: lcd.print("\1P\2BET M\2P");
+//
+// 
+// lcd.setCursor(3, 0);             // Устанавливаем курсор на 1 строку ячейку 3
+// lcd.print("\1");                 // Выводим букву "П"
+// lcd.setCursor(4, 0);             // Устанавливаем курсор на 1 строку ячейку 4
+// lcd.print("P");                  // Выводим букву "P"
+// lcd.setCursor(5, 0);             // Устанавливаем курсор на 1 строку ячейку 5
+// lcd.print("\2");                 // Выводим букву "И"
+// lcd.setCursor(6, 0);             // Устанавливаем курсор на 1 строку ячейку 6
+// lcd.print("B");                  // Выводим букву "B"
+// lcd.setCursor(7, 0);             // Устанавливаем курсор на 1 строку ячейку 7
+// lcd.print("E");                  // Выводим букву "E"
+// lcd.setCursor(8, 0);             // Устанавливаем курсор на 1 строку ячейку 8
+// lcd.print("T");                  // Выводим букву "T"
+// lcd.setCursor(10, 0);            // Устанавливаем курсор на 1 строку ячейку 10
+// lcd.print("M");                  // Выводим букву "М"
+// lcd.setCursor(11, 0);            // Устанавливаем курсор на 1 строку ячейку 11
+// lcd.print("\2");                 // Выводим букву "И"
+// lcd.setCursor(12, 0);            // Устанавливаем курсор на 1 строку ячейку 12
+// lcd.print("P");                  // Выводим букву "P"
+// 
+// lcd.setCursor(2, 1);             // Устанавливаем курсор на 2 строку ячейку 2
+// lcd.print ("www.rchip.ru") ;     // Выводим текст
+//}
+//
+//
+//
+////http://arduino.ru/forum/obshchii/lcd-1602-i-russkie-simvoly#comment-173977
+////выводите всю таблицу , и смотрите что там.
+//void loop() {
+//  int currentRow = 0;
+//  int currentCol = 0;
+//  for (int letter = 0; letter <= 255; letter++) {
+//    lcd.setCursor(currentCol, currentRow-1);
+//    lcd.print(char(letter));
+//    currentCol++;
+//      if (currentCol > 16){
+//        currentCol = 0;
+//       if (currentRow < 1 ){
+//        currentRow++;
+//        }
+//      else {
+//        delay(3000);
+//        lcd.clear();
+//        currentRow = 0;            
+//      }
+//    }
+//  }       
+//}
+//По вашему коду у меня не отображалось несколько последних символов.
+//Вначале я насчитал 7 обновлений экрана и у меня возникли подозрения.
+//Погуглив таблицу и написав свой кривой код вывода, убедился что мои подозрения были не напрасны: пропускается самая последняя строка.
+//В общем, с моими поправками ваш код вывода всех символов выглядит так:
+//void loop() {
+//  // put your main code here, to run repeatedly:
+//  int currentRow=0;
+//  int currentCol=0;
+//  for (int letter=0; letter <= 255; letter++) {    
+////  lcd.setCursor(currentCol, currentRow-1);
+//    lcd.setCursor(currentCol, currentRow);
+//    lcd.print(char(letter));
+//    currentCol++;    
+//
+////  if (currentCol > 16){
+//    if (currentCol > 15){
+//      currentCol=0;
+//      if (currentRow < 1) {        
+//        currentRow++;        
+//      }
+//      else {                
+//        delay(8000);
+//        lcd.clear();
+//        currentRow=0;
+//      }
+//    }
+//  }
+//}
+
  
- void loop() 
-{
+// void loop() 
+//{
+//
+//  dallas_requestTemp(DS_PIN); // запрос
+//  delay(900);
+//  tone(buzzer, 1000,100);
+//  float Current_tempr_value = dallas_getTemp(DS_PIN);
+//    
+//  if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) 
+//  {
+//    lcd.setCursor(0, 0);  
+//    lcd.print("TempSensor error");    
+//    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+//    PowerRele_State = OFF;
+//  }  
+//  else if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
+//  {
+//    PowerRele_State = OFF;
+//    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
+//    lcd.setCursor(0, 0);  
+//    lcd.print("Rele Off        ");   
+//  }
+//  else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State)   )
+//  {
+//    PowerRele_State = ON;
+//    digitalWrite(PowerRele_pin, LOW);   // turn Rele ON
+//    lcd.setCursor(0, 0);  
+//    lcd.print("Rele ON         ");  
+//  }
+//
+//  lcd.setCursor(0, 1);  
+//  lcd.print(TargetTemperature - TemperatureWindow);
+//  lcd.print("C  ");    
+//  lcd.print(Current_tempr_value);
+//  lcd.print("C  "); 
+//  lcd.print(TargetTemperature + TemperatureWindow);  
+//  lcd.print("C");
+//}
+//
+//
+//uint8_t tochki[8] = {B0, B00000, B0, B0, B0, B0, B10101};
+//uint8_t bukva_P[8] = {0x1F, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11};
+//uint8_t bukva_Ya[8] = {B01111, B10001, B10001, B01111, B00101, B01001, B10001};
+//uint8_t bukva_L[8] = {0x3, 0x7, 0x5, 0x5, 0xD, 0x9, 0x19};
+//uint8_t bukva_Lm[8] = {0, 0, B01111, B00101, B00101, B10101, B01001};
+//uint8_t bukva_Mz[8] = {0x10, 0x10, 0x10, 0x1E, 0x11, 0x11, 0x1E};
+//uint8_t bukva_I[8] = {0x11, 0x13, 0x13, 0x15, 0x19, 0x19, 0x11};
+//uint8_t bukva_D[8] = {B01111, B00101, B00101, B01001, B10001, B11111, 0x11};
+//uint8_t bukva_G[8] = {B11111, B10001, B10000, B10000, B10000, B10000, B10000};
+//uint8_t bukva_IY[8] = {B01110, B00000, B10001, B10011, B10101, B11001, B10001};
+//uint8_t bukva_Z[8] = {B01110, B10001, B00001, B00010, B00001, B10001, B01110};
+//uint8_t bukva_ZH[8] = {B10101, B10101, B10101, B11111, B10101, B10101, B10101};
+//uint8_t bukva_Y[8] = {B10001, B10001, B10001, B01010, B00100, B01000, B10000};
+//uint8_t bukva_B[8] = {B11110, B10000, B10000, B11110, B10001, B10001, B11110};
+//uint8_t bukva_CH[8] = {B10001, B10001, B10001, B01111, B00001, B00001, B00001};
+//uint8_t bukva_IYI[8] = {B10001, B10001, B10001, B11001, B10101, B10101, B11001};
+//uint8_t bukva_TS[8] = {B10010, B10010, B10010, B10010, B10010, B10010, B11111, B00001};
+//
+//
+//  // create a new character
+//  lcd.createChar(0, heart);
+//  // create a new character
+//  lcd.createChar(1, smiley);
+//  // create a new character
+//  lcd.createChar(2, frownie);
+//  // create a new character
+//  lcd.createChar(3, armsDown);
+//  // create a new character
+//  lcd.createChar(4, armsUp);
+//
+//  
 
-  dallas_requestTemp(DS_PIN); // запрос
-  delay(900);
-  tone(buzzer, 1000,100);
-  float Current_tempr_value = dallas_getTemp(DS_PIN);
-    
-  if (  ( Current_tempr_value > TemperatureMaxWorkRange ) || (Current_tempr_value  < TemperatureMinWorkRange)  ) 
-  {
-    lcd.setCursor(0, 0);  
-    lcd.print("TempSensor error");    
-    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
-    PowerRele_State = OFF;
-  }  
-  else if ( (Current_tempr_value >= TargetTemperature + TemperatureWindow) &&  ( ON == PowerRele_State)   )
-  {
-    PowerRele_State = OFF;
-    digitalWrite(PowerRele_pin, HIGH);   // turn Rele Off
-    lcd.setCursor(0, 0);  
-    lcd.print("Rele Off        ");   
-  }
-  else if ( (Current_tempr_value < TargetTemperature - TemperatureWindow) &&  ( OFF == PowerRele_State)   )
-  {
-    PowerRele_State = ON;
-    digitalWrite(PowerRele_pin, LOW);   // turn Rele ON
-    lcd.setCursor(0, 0);  
-    lcd.print("Rele ON         ");  
-  }
-
-  lcd.setCursor(0, 1);  
-  lcd.print(TargetTemperature - TemperatureWindow);
-  lcd.print("C  ");    
-  lcd.print(Current_tempr_value);
-  lcd.print("C  "); 
-  lcd.print(TargetTemperature + TemperatureWindow);  
-  lcd.print("C");
-}
 
 
-uint8_t tochki[8] = {B0, B00000, B0, B0, B0, B0, B10101};
-uint8_t bukva_P[8] = {0x1F, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11};
-uint8_t bukva_Ya[8] = {B01111, B10001, B10001, B01111, B00101, B01001, B10001};
-uint8_t bukva_L[8] = {0x3, 0x7, 0x5, 0x5, 0xD, 0x9, 0x19};
-uint8_t bukva_Lm[8] = {0, 0, B01111, B00101, B00101, B10101, B01001};
-uint8_t bukva_Mz[8] = {0x10, 0x10, 0x10, 0x1E, 0x11, 0x11, 0x1E};
-uint8_t bukva_I[8] = {0x11, 0x13, 0x13, 0x15, 0x19, 0x19, 0x11};
-uint8_t bukva_D[8] = {B01111, B00101, B00101, B01001, B10001, B11111, 0x11};
-uint8_t bukva_G[8] = {B11111, B10001, B10000, B10000, B10000, B10000, B10000};
-uint8_t bukva_IY[8] = {B01110, B00000, B10001, B10011, B10101, B11001, B10001};
-uint8_t bukva_Z[8] = {B01110, B10001, B00001, B00010, B00001, B10001, B01110};
-uint8_t bukva_ZH[8] = {B10101, B10101, B10101, B11111, B10101, B10101, B10101};
-uint8_t bukva_Y[8] = {B10001, B10001, B10001, B01010, B00100, B01000, B10000};
-uint8_t bukva_B[8] = {B11110, B10000, B10000, B11110, B10001, B10001, B11110};
-uint8_t bukva_CH[8] = {B10001, B10001, B10001, B01111, B00001, B00001, B00001};
-uint8_t bukva_IYI[8] = {B10001, B10001, B10001, B11001, B10101, B10101, B11001};
-uint8_t bukva_TS[8] = {B10010, B10010, B10010, B10010, B10010, B10010, B11111, B00001};
-
-
-  // create a new character
-  lcd.createChar(0, heart);
-  // create a new character
-  lcd.createChar(1, smiley);
-  // create a new character
-  lcd.createChar(2, frownie);
-  // create a new character
-  lcd.createChar(3, armsDown);
-  // create a new character
-  lcd.createChar(4, armsUp);
-
-  
-
-
-*/
 //
 //// функция для настройки PCINT для ATmega328 (UNO, Nano, Pro Mini)
 uint8_t attachPCINT(uint8_t pin) {
