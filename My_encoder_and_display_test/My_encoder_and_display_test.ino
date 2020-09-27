@@ -23,7 +23,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 // Целевая температура, будет зависеть от типа пластика примерно от 50 для ПЛА до 90 для нейлона
 #define TargetTemperature 25 
 // окно гистерезиса, чтоб не постоянно щелкать релюхой, а только иногда. Диапазон допустимых температур от TargetTemperature - TemperatureWindow до TargetTemperature + TemperatureWindow
-#define TemperatureWindow 2
+#define TemperatureWindow 0
 #define TemperatureMaxWorkRange 100
 #define TemperatureMinWorkRange 5
 
@@ -155,7 +155,7 @@ unsigned char PlasticType_index = 0;
 unsigned int WaitTime_5min_step = 0;
 #define WaitTime_5min_step_Max 288
 unsigned int    TotalTime; 
-const unsigned char DryTime[4] = {10, 20, 30, 40};
+const unsigned char DryTime[4] = {100, 20, 30, 40};
 const unsigned char DryTemp[4] = {50, 60, 70, 80};
 unsigned long WaitTime_01sec_step=0, DryTime_01sec_step = 0;
 
